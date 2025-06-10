@@ -90,4 +90,4 @@ The application uses MongoDB with the following collections:
 - **In-memory Optimizations**: Some calculations happen in-memory rather than in the database
 
 ## 👤 Author
-- [jay-3107](https://github.com/jay-3107) - Last updated: 2023-06-10
+- [jay-3107](https://github.com/jay-3107) 
