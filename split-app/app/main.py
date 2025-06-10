@@ -72,7 +72,7 @@ async def root():
     
     return {
         "status": "ok", 
-        "message": "Expense Splitter API is running",
+        "message": "Expense Splitter API is runing",
         "environment": os.getenv("ENVIRONMENT", "development"),
         "database": {
             "connection": "Configured" if os.getenv("MONGODB_URI") else "Not configured",
