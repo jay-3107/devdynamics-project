@@ -151,3 +151,10 @@ $RECYCLE.BIN/
 *.env
 *.log
 logs/
+
+# Backend .gitignore
+expense-frontend/
+venv/
+__pycache__/
+*.pyc
+.env

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: expense-splitter-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: DB_NAME
+        value: expense_splitter
+      - key: ENVIRONMENT
+        value: production
+      - key: FRONTEND_URL
+        sync: false

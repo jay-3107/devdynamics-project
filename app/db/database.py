@@ -111,6 +111,10 @@ async def seed_initial_data():
 
 async def close_db():
     """Close database connection"""
-    if client:
-        client.close()
-        logger.info("Closed MongoDB connection")
+    global client
+    try:
+        if client:
+            client.close()
+            logger.info("Closed MongoDB connection")
+    except Exception as e:
+        logger.error(f"Error closing MongoDB connection: {e}")
