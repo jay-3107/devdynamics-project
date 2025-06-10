@@ -1,122 +1,126 @@
 // src/components/expenses/ParticipantsSelection.jsx
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FormLabel } from "@/components/ui/form";
-import { PlusCircle } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
-export function ParticipantsSelection({ form, people }) {
-  const [newParticipantName, setNewParticipantName] = useState("");
-  const [showNewParticipantInput, setShowNewParticipantInput] = useState(false);
+export function ParticipantsSelection({ form, people = [] }) {
+  const [newParticipant, setNewParticipant] = React.useState("");
   const participants = form.watch("participants") || [];
-  
-  // Handle participant selection
-  const handleParticipantToggle = (personName) => {
-    const currentParticipants = form.getValues("participants") || [];
-    const updatedParticipants = currentParticipants.includes(personName)
-      ? currentParticipants.filter(p => p !== personName)
-      : [...currentParticipants, personName];
+  const paidBy = form.watch("paid_by");
+
+  // Ensure payer always stays in participants list
+  useEffect(() => {
+    if (paidBy && !participants.includes(paidBy)) {
+      form.setValue("participants", [...participants, paidBy]);
+    }
+  }, [paidBy, participants, form]);
+
+  const toggleParticipant = (name) => {
+    const updatedParticipants = [...participants];
+    const index = updatedParticipants.indexOf(name);
+    
+    // If the person being toggled is the payer, don't allow removal
+    if (name === paidBy && index >= 0) {
+      return;
+    }
+    
+    if (index >= 0) {
+      updatedParticipants.splice(index, 1);
+    } else {
+      updatedParticipants.push(name);
+    }
     
     form.setValue("participants", updatedParticipants);
   };
   
-  // Handle adding a new participant
-  const handleAddNewParticipant = () => {
-    if (newParticipantName.trim() === "") return;
+  const addNewParticipant = () => {
+    if (!newParticipant.trim()) return;
+    if (participants.includes(newParticipant)) return;
     
-    // Add to participants list
-    const currentParticipants = form.getValues("participants") || [];
-    if (!currentParticipants.includes(newParticipantName)) {
-      form.setValue("participants", [...currentParticipants, newParticipantName]);
-      
-      // Reset the input and hide it
-      setNewParticipantName("");
-      setShowNewParticipantInput(false);
-    }
+    form.setValue("participants", [...participants, newParticipant]);
+    setNewParticipant("");
   };
 
+  // Combine people from props and existing participants to show all options
+  const allPeople = [...new Set([
+    ...participants,
+    ...people.map(person => person.name)
+  ])].sort();
+
   return (
-    <div>
-      <FormLabel>Participants</FormLabel>
-      <div className="grid grid-cols-2 gap-2 mt-2">
-        {/* Existing people list */}
-        {people.map((person) => {
-          const personName = person.name;
-          const isSelected = participants.includes(personName);
-          return (
-            <div
-              key={person._id || person.id || person.name}
-              className={`flex items-center p-2 rounded border ${
-                isSelected ? "bg-primary/10 border-primary" : "border-input"
-              }`}
-            >
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => handleParticipantToggle(personName)}
-              />
-              <span className="ml-2">{personName}</span>
+    <FormField
+      control={form.control}
+      name="participants"
+      render={() => (
+        <FormItem className="space-y-4">
+          <FormLabel>Participants</FormLabel>
+          
+          <div className="flex flex-wrap gap-2">
+            {allPeople.map((person) => (
+              <div 
+                key={person}
+                className={`flex items-center space-x-2 border rounded-md p-2 ${
+                  person === paidBy ? "border-primary" : ""
+                }`}
+              >
+                <Checkbox
+                  checked={participants.includes(person)}
+                  onCheckedChange={() => toggleParticipant(person)}
+                  disabled={person === paidBy} // Disable checkbox for the payer
+                />
+                <label className="text-sm font-medium leading-none cursor-pointer">
+                  {person}
+                  {person === paidBy && (
+                    <span className="ml-1 text-xs text-muted-foreground">(paid)</span>
+                  )}
+                </label>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex gap-2">
+            <Input
+              placeholder="Add New Participant"
+              value={newParticipant}
+              onChange={(e) => setNewParticipant(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addNewParticipant())}
+            />
+            <Button type="button" onClick={addNewParticipant} variant="outline">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {/* Show selected participants */}
+          {participants.length > 0 && (
+            <div>
+              <div className="text-sm text-muted-foreground mb-2">Selected:</div>
+              <div className="flex flex-wrap gap-2">
+                {participants.map(participant => (
+                  <div 
+                    key={participant}
+                    className={`bg-primary/10 px-2 py-1 rounded-md text-sm flex items-center gap-1 ${
+                      participant === paidBy ? "border border-primary" : ""
+                    }`}
+                  >
+                    {participant}
+                    {participant !== paidBy && (
+                      <X 
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => toggleParticipant(participant)}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          );
-        })}
-        
-        {/* Custom participants that were added previously */}
-        {participants
-          .filter(name => !people.some(p => p.name === name))
-          .map(customName => (
-            <div
-              key={customName}
-              className="flex items-center p-2 rounded border bg-primary/10 border-primary"
-            >
-              <Checkbox
-                checked={true}
-                onCheckedChange={() => handleParticipantToggle(customName)}
-              />
-              <span className="ml-2">{customName}</span>
-            </div>
-          ))
-        }
-      </div>
-      
-      {/* Add new participant section */}
-      {showNewParticipantInput ? (
-        <div className="flex mt-2 gap-2">
-          <Input
-            value={newParticipantName}
-            onChange={(e) => setNewParticipantName(e.target.value)}
-            placeholder="Enter name"
-            className="flex-1"
-            autoFocus
-          />
-          <Button type="button" size="sm" onClick={handleAddNewParticipant}>
-            Add
-          </Button>
-          <Button 
-            type="button" 
-            size="sm" 
-            variant="outline" 
-            onClick={() => setShowNewParticipantInput(false)}
-          >
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-2"
-          onClick={() => setShowNewParticipantInput(true)}
-        >
-          <PlusCircle className="h-4 w-4 mr-1" /> Add New Participant
-        </Button>
+          )}
+          
+          <FormMessage />
+        </FormItem>
       )}
-      
-      {form.formState.errors.participants && (
-        <p className="text-sm font-medium text-destructive mt-2">
-          {form.formState.errors.participants.message}
-        </p>
-      )}
-    </div>
+    />
   );
 }
