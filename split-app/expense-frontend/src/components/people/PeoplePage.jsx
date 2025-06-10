@@ -144,7 +144,7 @@ function PeoplePage() {
                         {selectedPerson ? `${selectedPerson.name} Details` : "Person Details"}
                     </TabsTrigger>
                     <TabsTrigger value="groups">Groups</TabsTrigger>
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    {/* <TabsTrigger value="analytics">Analytics</TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="directory">
