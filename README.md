@@ -76,19 +76,18 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-🗄️ Database Schema
+## 🗄️ Database Schema
 The application uses MongoDB with the following collections:
 
-expenses: Stores expense records with title, amount, payer, participants, and split information
-balances: Calculated balances between users (generated, not stored)
-settlements: Optimized transactions to settle debts (generated, not stored)
+- **expenses**: Stores expense records with title, amount, payer, participants, and split information
+- **balances**: Calculated balances between users (generated, not stored)
+- **settlements**: Optimized transactions to settle debts (generated, not stored)
 
-⚠️ Limitations & Assumptions
-Single Currency: Currently supports calculations in a single currency
-No Authentication: API doesn't implement user authentication/authorization
-Simplified Person Model: People are identified by name only without user accounts
-In-memory Optimizations: Some calculations happen in-memory rather than in the database
+## ⚠️ Limitations & Assumptions
+- **Single Currency**: Currently supports calculations in a single currency
+- **No Authentication**: API doesn't implement user authentication/authorization
+- **Simplified Person Model**: People are identified by name only without user accounts
+- **In-memory Optimizations**: Some calculations happen in-memory rather than in the database
 
-
-👤 Author
-jay-3107 - Last updated: 2023-06-10
+## 👤 Author
+- [jay-3107](https://github.com/jay-3107) - Last updated: 2023-06-10
