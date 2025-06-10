@@ -55,7 +55,7 @@ Solution:
 - Charlie pays $40 to Alice
 
 ## 🔧 Local Development Setup
-
+### Backend Setup
 ```bash
 # Clone repository
 git clone https://github.com/jay-3107/devdynamics-project.git
@@ -74,6 +74,19 @@ cp .env.example .env
 
 # Run the application
 uvicorn app.main:app --reload
+```
+### Frontend Setup 
+```bash
+# Navigate to frontend directory
+cd split-app
+cd expense-frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+# This will start the Vite dev server, typically on http://localhost:5173
 ```
 
 ## 🗄️ Database Schema
