@@ -5,6 +5,10 @@ import { PeopleDirectory } from "./PeopleDirectory";
 import { PersonDetails } from "./PersonDetails";
 import { GroupsManager } from "./GroupsManager";
 import { PersonAnalytics } from "./PersonAnalytics";
+import { Alert, AlertDescription } from "@/components/ui/alert"; // You may need to install this
+
+// Local storage key for locally added people
+const LOCAL_PEOPLE_KEY = "expense_tracker_local_people";
 
 function PeoplePage() {
   const [people, setPeople] = useState([]);
@@ -17,6 +21,8 @@ function PeoplePage() {
     const fetchPeople = async () => {
       try {
         setLoading(true);
+        
+        // Fetch people from API
         const response = await fetch("http://localhost:8000/people/");
         
         if (!response.ok) {
@@ -25,8 +31,30 @@ function PeoplePage() {
         
         const data = await response.json();
         
+        // Get locally added people
+        const localPeopleJson = localStorage.getItem(LOCAL_PEOPLE_KEY);
+        const localPeople = localPeopleJson ? JSON.parse(localPeopleJson) : [];
+        
         if (data.success && Array.isArray(data.data)) {
-          setPeople(data.data);
+          // Combine API people with local people
+          // Make sure to avoid duplicates based on name
+          const apiPeopleNames = new Set(data.data.map(p => p.name.toLowerCase()));
+          
+          // Filter out local people that now exist in the API
+          const uniqueLocalPeople = localPeople.filter(
+            p => !apiPeopleNames.has(p.name.toLowerCase())
+          );
+          
+          // Update localStorage to remove duplicates
+          localStorage.setItem(LOCAL_PEOPLE_KEY, JSON.stringify(uniqueLocalPeople));
+          
+          // Combine both lists
+          const combinedPeople = [
+            ...data.data,
+            ...uniqueLocalPeople
+          ];
+          
+          setPeople(combinedPeople);
         } else {
           console.error("Unexpected API response format:", data);
           setError("Failed to load people: Invalid response format");
@@ -34,6 +62,18 @@ function PeoplePage() {
       } catch (err) {
         console.error("Error fetching people:", err);
         setError(`Failed to load people: ${err.message}`);
+        
+        // If API fails, at least show local people
+        const localPeopleJson = localStorage.getItem(LOCAL_PEOPLE_KEY);
+        if (localPeopleJson) {
+          try {
+            const localPeople = JSON.parse(localPeopleJson);
+            setPeople(localPeople);
+            setError("Could not load people from server, showing locally added people only.");
+          } catch (e) {
+            // Local storage error
+          }
+        }
       } finally {
         setLoading(false);
       }
@@ -48,6 +88,11 @@ function PeoplePage() {
     setActiveTab("details"); // Automatically switch to details tab
   };
   
+  // Handle when a new person is added
+  const handlePersonAdded = (newPerson) => {
+    setPeople(prev => [...prev, newPerson]);
+  };
+  
   if (loading) {
     return (
       <div className="container mx-auto py-8">
@@ -58,7 +103,7 @@ function PeoplePage() {
     );
   }
   
-  if (error) {
+  if (error && people.length === 0) {
     return (
       <div className="container mx-auto py-8">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -71,6 +116,12 @@ function PeoplePage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-semibold mb-6">People</h1>
+      
+      {error && (
+        <Alert variant="warning" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
@@ -90,6 +141,7 @@ function PeoplePage() {
             people={people}
             selectedPerson={selectedPerson}
             onPersonSelect={handlePersonSelect}
+            onPersonAdded={handlePersonAdded}
           />
         </TabsContent>
         

@@ -8,6 +8,7 @@ import AddExpense from "./components/expenses/AddExpense";
 import BalancesPage from "./components/balances/BalancesPage";
 import SettlementsPage from "./components/settlements/SettlementsPage";
 import PeoplePage from "./components/people/PeoplePage";
+import { Toaster } from "@/components/ui/toaster";
 
 import {
   Breadcrumb,
@@ -73,6 +74,9 @@ function App() {
           </Routes>
         </div>
       </SidebarInset>
+      
+      {/* Add the Toaster component here, outside of the routes */}
+      <Toaster />
     </SidebarProvider>
   );
 }

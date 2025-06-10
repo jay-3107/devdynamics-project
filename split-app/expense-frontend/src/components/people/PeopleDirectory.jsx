@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PlusCircle, Search, User } from "lucide-react";
 import { AddPersonDialog } from "./AddPersonDialog";
 
-export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
+export function PeopleDirectory({ people, selectedPerson, onPersonSelect, onPersonAdded }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddDialog, setShowAddDialog] = useState(false);
   
@@ -21,8 +21,13 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  // Sort by most transactions first
-  const sortedPeople = [...filteredPeople].sort((a, b) => b.count - a.count);
+  // Sort by most transactions first, then alphabetically for those with same count
+  const sortedPeople = [...filteredPeople].sort((a, b) => {
+    if (b.count === a.count) {
+      return a.name.localeCompare(b.name);
+    }
+    return b.count - a.count;
+  });
   
   // Check if a person is selected
   const isSelected = (person) => selectedPerson && selectedPerson.name === person.name;
@@ -48,7 +53,8 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
       
       {/* Help text for new users */}
       <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded text-sm">
-        Click <strong>View Details</strong> on any person card to see their expense history and balance details.
+        Click <strong>View Details</strong> on any person card to see their expense history and balance details. 
+        Adding new people here will make them available when creating new expenses.
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -57,7 +63,7 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
             key={person.name} 
             className={`overflow-hidden transition-colors ${
               isSelected(person) ? "border-primary bg-primary/5" : ""
-            }`}
+            } ${person.isLocal ? "border-dashed" : ""}`}
           >
             <CardHeader className="pb-2">
               <div className="flex items-center gap-4">
@@ -65,7 +71,12 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
                   <AvatarFallback>{person.name.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle>{person.name}</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    {person.name}
+                    {person.isLocal && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">New</span>
+                    )}
+                  </CardTitle>
                 </div>
               </div>
             </CardHeader>
@@ -74,7 +85,7 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
               <div className="text-sm">
                 <div className="flex items-center gap-1">
                   <span className="text-muted-foreground">Involved in:</span>
-                  <span className="font-medium">{person.count} expenses</span>
+                  <span className="font-medium">{person.count || 0} expenses</span>
                 </div>
               </div>
             </CardContent>
@@ -102,7 +113,11 @@ export function PeopleDirectory({ people, selectedPerson, onPersonSelect }) {
         )}
       </div>
       
-      <AddPersonDialog open={showAddDialog} setOpen={setShowAddDialog} />
+      <AddPersonDialog 
+        open={showAddDialog} 
+        setOpen={setShowAddDialog} 
+        onPersonAdded={onPersonAdded}  // Pass the callback
+      />
     </div>
   );
 }
