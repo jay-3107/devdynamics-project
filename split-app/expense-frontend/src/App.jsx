@@ -7,6 +7,7 @@ import EditExpense from "@/components/expenses/EditExpense";
 import AddExpense from "./components/expenses/AddExpense";
 import BalancesPage from "./components/balances/BalancesPage";
 import SettlementsPage from "./components/settlements/SettlementsPage";
+import PeoplePage from "./components/people/PeoplePage";
 
 import {
   Breadcrumb,
@@ -34,11 +35,7 @@ const Dashboard = () => (
   </div>
 );
 
-// Other placeholder pages
-// const AddExpense = () => <div>Add Expense Page</div>;
-const People = () => <div>People Page</div>;
-// const Balances = () => <div>Balances Page</div>;
-// const Settlements = () => <div>Settlements Page</div>;
+
 const Groups = () => <div>Groups Page</div>;
 const CreateGroup = () => <div>Create Group Page</div>;
 
@@ -68,7 +65,7 @@ function App() {
             <Route path="/expenses" element={<AllExpenses />} />
             <Route path="/expenses/add" element={<AddExpense />} />
             <Route path="/expenses/edit/:expenseId" element={<EditExpense />} />
-            <Route path="/people" element={<People />} />
+            <Route path="/people" element={<PeoplePage />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/new" element={<CreateGroup />} />
             <Route path="/balances" element={<BalancesPage />} />
