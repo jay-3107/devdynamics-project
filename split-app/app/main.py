@@ -4,7 +4,7 @@ import logging
 import os
 from dotenv import load_dotenv
 
-from app.db.database import init_db
+from app.db.database import init_db, close_db
 from app.routers import expenses, settlements, people
 
 # Load environment variables
@@ -25,10 +25,23 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Configure CORS
+# Get frontend URL from environment or use default for local development
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# Configure CORS - more restrictive for production
+allowed_origins = [
+    FRONTEND_URL,  # Your frontend URL from env var
+    "http://localhost:5173",  # Local development frontend
+    "http://localhost:3000",  # Alternative local frontend port
+]
+
+# If we're not in production, allow all origins for easier development
+if os.getenv("ENVIRONMENT") != "production":
+    allowed_origins.append("*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For production, replace with specific origins
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,14 +54,31 @@ app.include_router(people.router, prefix="/people", tags=["People"])
 
 @app.on_event("startup")
 async def startup_db_client():
-    logger.info("Connecting to MongoDB...")
+    logger.info("Starting up and connecting to MongoDB...")
     await init_db()
     logger.info("Connected to MongoDB!")
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    logger.info("Shutting down and closing MongoDB connection...")
+    await close_db()
+    logger.info("MongoDB connection closed!")
 
 @app.get("/", tags=["Health"])
 async def root():
     """Health check endpoint"""
-    return {"status": "ok", "message": "Expense Splitter API is running"}
+    mongodb_uri = os.getenv("MONGODB_URI", "Not set")
+    safe_uri = mongodb_uri.replace("://", "://***:***@") if "://" in mongodb_uri else "Not set"
+    
+    return {
+        "status": "ok", 
+        "message": "Expense Splitter API is running",
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "database": {
+            "connection": "Configured" if os.getenv("MONGODB_URI") else "Not configured",
+            "uri_sample": safe_uri.split("@")[-1] if "@" in safe_uri else "local"
+        }
+    }
 
 if __name__ == "__main__":
     import uvicorn
