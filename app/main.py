@@ -25,14 +25,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Get frontend URL from environment or use default for local development
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+# Get frontend URL from environment or use deployed frontend URL
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://expense-splitter-frontend.onrender.com")
 
 # Configure CORS - more restrictive for production
 allowed_origins = [
-    FRONTEND_URL,  # Your frontend URL from env var
-    "http://localhost:5173",  # Local development frontend
-    "http://localhost:3000",  # Alternative local frontend port
+    FRONTEND_URL,                                     # Your frontend URL from env var
+    "http://localhost:5173",                          # Local development frontend
+    "http://localhost:3000",                          # Alternative local frontend port
+    "https://expense-splitter-frontend.onrender.com"  # Directly add your deployed frontend URL
 ]
 
 # If we're not in production, allow all origins for easier development
@@ -72,7 +73,7 @@ async def root():
     
     return {
         "status": "ok", 
-        "message": "Expense Splitter API is runing",
+        "message": "Expense Splitter API is running",
         "environment": os.getenv("ENVIRONMENT", "development"),
         "database": {
             "connection": "Configured" if os.getenv("MONGODB_URI") else "Not configured",
