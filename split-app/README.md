@@ -23,9 +23,3 @@ A backend system for splitting expenses among groups of people. Built with FastA
 - `GET /settlements` - Get current settlement summary
 - `GET /balances` - Show each person's balance (owes/owed)
 - `GET /people` - List all people (derived from expenses)
-
-## Setup and Deployment
-
-### Local Development
-
-1. Install dependencies:
