@@ -62,7 +62,7 @@ function App() {
         <div className="p-4">
         
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<AllExpenses />} />
             <Route path="/expenses" element={<AllExpenses />} />
             <Route path="/expenses/add" element={<AddExpense />} />
             <Route path="/expenses/edit/:expenseId" element={<EditExpense />} />

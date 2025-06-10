@@ -24,6 +24,7 @@ export function AmountInput({ form }) {
               type="number"
               step="any"
               placeholder="0.00"
+              required
             />
           </FormControl>
           <FormMessage />

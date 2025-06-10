@@ -21,8 +21,8 @@ const expenseSplitterData = {
       title: "Dashboard",
       items: [
         {
-          title: "Overview",
-          url: "/",
+          title: "",
+          url: "",
           isActive: true,
         },
       ],
@@ -44,7 +44,7 @@ const expenseSplitterData = {
       title: "People",
       items: [
         {
-          title: "Manage People",
+          title: "Manage People | Groups | Analytics",
           url: "/people",
         },
       ],
@@ -63,15 +63,15 @@ const expenseSplitterData = {
       ],
     },
     {
-      title: "Groups",
+      title: "",
       items: [
         {
-          title: "Manage Groups",
-          url: "/groups",
+          title: "",
+          url: "",
         },
         {
-          title: "Create Group",
-          url: "/groups/new",
+          title: "",
+          url: "",
         },
       ],
     },
