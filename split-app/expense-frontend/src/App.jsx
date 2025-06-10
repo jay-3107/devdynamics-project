@@ -6,6 +6,8 @@ import AllExpenses from "@/components/AllExpenses"; // Import your AllExpenses c
 import EditExpense from "@/components/expenses/EditExpense";
 import AddExpense from "./components/expenses/AddExpense";
 import BalancesPage from "./components/balances/BalancesPage";
+import SettlementsPage from "./components/settlements/SettlementsPage";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,7 +38,7 @@ const Dashboard = () => (
 // const AddExpense = () => <div>Add Expense Page</div>;
 const People = () => <div>People Page</div>;
 // const Balances = () => <div>Balances Page</div>;
-const Settlements = () => <div>Settlements Page</div>;
+// const Settlements = () => <div>Settlements Page</div>;
 const Groups = () => <div>Groups Page</div>;
 const CreateGroup = () => <div>Create Group Page</div>;
 
@@ -67,11 +69,10 @@ function App() {
             <Route path="/expenses/add" element={<AddExpense />} />
             <Route path="/expenses/edit/:expenseId" element={<EditExpense />} />
             <Route path="/people" element={<People />} />
-            {/* <Route path="/balances" element={<Balances />} /> */}
-            <Route path="/settlements" element={<Settlements />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/new" element={<CreateGroup />} />
             <Route path="/balances" element={<BalancesPage />} />
+            <Route path="/settlements" element={<SettlementsPage />} />
           </Routes>
         </div>
       </SidebarInset>
